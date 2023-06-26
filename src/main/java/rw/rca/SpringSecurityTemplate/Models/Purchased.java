@@ -23,10 +23,9 @@ public class Purchased {
     private double total;
     private Date date;
 
-    public Purchased(Product product, int quantity, double total, Date date) {
+    public Purchased(Product product, int quantity, Date date) {
         this.product = product;
         this.quantity = quantity;
-        this.total = total;
         this.date = date;
     }
 }

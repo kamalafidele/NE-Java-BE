@@ -4,17 +4,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import rw.rca.SpringSecurityTemplate.Models.Product;
 import rw.rca.SpringSecurityTemplate.Models.Quantity;
+import rw.rca.SpringSecurityTemplate.Pojos.Request.QuantityRequest;
+import rw.rca.SpringSecurityTemplate.Services.ProductService;
 import rw.rca.SpringSecurityTemplate.Services.QuantityService;
 
+import java.util.Optional;
+
+@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping("/api/quantities")
 public class QuantityController {
     private final QuantityService quantityService;
+    private final ProductService productService;
 
     @Autowired
-    public QuantityController(QuantityService quantityService) {
+    public QuantityController(QuantityService quantityService, ProductService productService) {
         this.quantityService = quantityService;
+        this.productService = productService;
     }
 
     @GetMapping
@@ -33,8 +41,11 @@ public class QuantityController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createQuantity(@RequestBody Quantity quantity) {
-        Quantity createdQuantity = quantityService.saveQuantity(quantity);
+    public ResponseEntity<?> createQuantity(@RequestBody QuantityRequest quantityRequest) {
+        Optional<Product> product = productService.getProductById(quantityRequest.getProductId());
+        Quantity newQuantity = new Quantity(product.get(), quantityRequest.getQuantity(), quantityRequest.getOperation(), quantityRequest.getDate());
+
+        Quantity createdQuantity = quantityService.saveQuantity(newQuantity);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdQuantity);
     }
 
